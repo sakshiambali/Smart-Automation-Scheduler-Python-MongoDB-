@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily Global Tech News Scheduler</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+<div class="app-wrapper">
+
+  <!-- ═══════════════════════════════════════════════
+       HEADER
+  ════════════════════════════════════════════════ -->
+  <header>
+    <div class="logo">
+      <div class="logo-icon">🌐</div>
+      <div>
+        <h1>Daily Global Tech News Scheduler</h1>
+        <p>Automated technology intelligence — powered by Python + MongoDB</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button id="btnFetchNow" class="btn btn-outline btn-sm">
+        ⚡ Fetch News Now
+      </button>
+      <button id="themeToggle" class="btn btn-ghost" title="Toggle theme">☀️</button>
+    </div>
+  </header>
+
+  <!-- Global toast / error messages -->
+  <div id="toastMessage"  class="new-articles-toast mt-2" style="display:none"></div>
+  <div id="errorMessage"  class="error-toast mt-2"         style="display:none"></div>
+
+  <!-- ═══════════════════════════════════════════════
+       MAIN DASHBOARD GRID
+  ════════════════════════════════════════════════ -->
+  <div class="dashboard-grid">
+
+    <!-- ───────────────────────────────────────────
+         LEFT COLUMN — Scheduler controls
+    ──────────────────────────────────────────── -->
+    <div class="scheduler-panel">
+
+      <!-- Interval Selector -->
+      <div class="panel">
+        <div class="panel-title">⚙️ Select Refresh Interval</div>
+        <div class="interval-grid" id="intervalGrid">
+          <!-- Built by app.js buildIntervalCards() -->
+        </div>
+      </div>
+
+      <!-- Scheduler Actions -->
+      <div class="panel">
+        <div class="panel-title">🎛️ Scheduler Controls</div>
+        <div class="sched-actions">
+          <button id="btnStart" class="btn btn-success">▶ Start</button>
+          <button id="btnStop"  class="btn btn-danger"  disabled>■ Stop</button>
+          <button id="btnSave"  class="btn btn-outline">💾 Save</button>
+        </div>
+        <p class="text-muted mt-2">
+          Start — activates automatic news refresh at the selected interval.<br>
+          Stop  — pauses the schedule (does not delete collected news).<br>
+          Save  — persists your setting across app restarts.
+        </p>
+      </div>
+
+      <!-- Status Panel -->
+      <div class="panel">
+        <div class="panel-title">📊 Scheduler Status</div>
+
+        <!-- Running badge -->
+        <div class="flex items-center gap-2" style="margin-bottom:16px">
+          <span id="statusBadge" class="badge badge-red">
+            <span class="dot"></span> Stopped
+          </span>
+          <!-- In-progress spinner (shown while job runs) -->
+          <span id="jobInProgress" class="flex items-center gap-2 text-muted" style="display:none!important">
+            <span class="spinner" style="width:16px;height:16px;border-width:2px"></span>
+            Fetching...
+          </span>
+        </div>
+
+        <div class="status-rows">
+          <div class="status-row">
+            <span class="label">Current Interval</span>
+            <span class="value" id="currentInterval">—</span>
+          </div>
+          <div class="status-row">
+            <span class="label">Last Refresh</span>
+            <span class="value" id="lastRun">Never</span>
+          </div>
+          <div class="status-row">
+            <span class="label">Next Refresh</span>
+            <span class="value" id="nextRun">—</span>
+          </div>
+          <div class="status-row">
+            <span class="label">New Articles</span>
+            <span class="value" id="lastSaved">0 new</span>
+          </div>
+          <div class="status-row">
+            <span class="label">Duplicates</span>
+            <span class="value" id="lastDuplicates">0 skipped</span>
+          </div>
+        </div>
+
+        <!-- Error message (hidden unless there is an error) -->
+        <div id="lastError" class="error-toast mt-2" style="display:none"></div>
+      </div>
+
+      <!-- Countdown Timer -->
+      <div class="panel">
+        <div class="panel-title">⏱️ Next Refresh In</div>
+        <div class="countdown-box">
+          <div class="countdown-label">Time remaining</div>
+          <div class="countdown-value" id="countdownValue">--:--:--</div>
+        </div>
+        <p class="text-muted mt-2" style="text-align:center;font-size:.75rem">
+          Updates every second · Polls backend every 15s
+        </p>
+      </div>
+
+      <!-- New articles notification -->
+      <div id="newArticlesToast" class="new-articles-toast" style="display:none"></div>
+
+    </div><!-- /scheduler-panel -->
+
+
+    <!-- ───────────────────────────────────────────
+         RIGHT COLUMN — News feed
+    ──────────────────────────────────────────── -->
+    <div class="news-panel">
+
+      <!-- Toolbar: search + category filters -->
+      <div class="panel">
+        <div class="panel-title">🔍 Search & Filter</div>
+        <div class="news-toolbar">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Search by title, description, category..."
+            />
+          </div>
+        </div>
+        <div class="category-tabs mt-2" id="categoryTabs">
+          <!-- Built by app.js buildCategoryTabs() -->
+        </div>
+      </div>
+
+      <!-- Stats bar -->
+      <div class="stats-bar">
+        <span>Total: <span class="highlight" id="articleCount">0</span> articles</span>
+        <span>Showing: <span class="highlight" id="filteredCount">0</span></span>
+        <span class="text-muted">Auto-refreshes after each scheduled run</span>
+      </div>
+
+      <!-- News cards grid -->
+      <div class="news-grid" id="newsGrid">
+        <!-- Loading state shown initially by app.js -->
+        <div class="loading-overlay" style="grid-column:1/-1">
+          <div class="spinner"></div>
+          <span>Loading articles...</span>
+        </div>
+      </div>
+
+    </div><!-- /news-panel -->
+
+  </div><!-- /dashboard-grid -->
+
+</div><!-- /app-wrapper -->
+
+<script src="/static/app.js"></script>
+</body>
+</html>

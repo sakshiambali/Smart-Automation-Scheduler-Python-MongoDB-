@@ -1,0 +1,30 @@
+# =============================================================
+# .gitignore — Files Git will NEVER track
+# =============================================================
+
+# Secrets — most important
+.env
+
+# Python cache files (auto-generated, not needed in Git)
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environment folder
+venv/
+env/
+.venv/
+
+# VS Code settings (personal, not project)
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
