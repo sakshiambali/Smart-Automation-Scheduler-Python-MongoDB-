@@ -1,1 +1,0 @@
-# Smart-Automation-Scheduler-Python-MongoDB-
